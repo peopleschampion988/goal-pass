@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { requireAdmin } from "@/lib/admin-auth";
-import { getDict, plural, words } from "@/lib/i18n";
+import { gameName, getDict, plural, words } from "@/lib/i18n";
 import { getLocale } from "@/lib/locale";
 import { getSupabase } from "@/lib/supabase";
 import type { Club, Game, Player } from "@/lib/types";
@@ -20,7 +20,7 @@ export default async function AdminGamePage({ params }: PageProps<"/admin/games/
   const [{ data: game }, { data: plays }] = await Promise.all([
     supabase
       .from("games")
-      .select("id, name, status, kind, position, created_at")
+      .select("id, name_en, name_ru, status, kind, position, created_at")
       .eq("id", gameId)
       .maybeSingle<Game>(),
     supabase.from("plays").select("winner_club_id, winner_player_id").eq("game_id", gameId),
@@ -76,7 +76,7 @@ export default async function AdminGamePage({ params }: PageProps<"/admin/games/
         {t.admin.back}
       </Link>
       <div className="mt-6 flex flex-col gap-1">
-        <h1 className="text-2xl font-bold">{game.name}</h1>
+        <h1 className="text-2xl font-bold">{gameName(game, locale)}</h1>
         <p className="text-sm text-foreground/60">
           <span className={game.status === "open" ? "text-green-600" : "text-red-500"}>
             ● {game.status === "open" ? t.admin.open : t.admin.closed}

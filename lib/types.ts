@@ -22,7 +22,8 @@ export type GameKind = "clubs" | "players";
 
 export type Game = {
   id: string;
-  name: string;
+  name_en: string;
+  name_ru: string;
   status: GameStatus;
   kind: GameKind;
   position: Position | null;

@@ -42,10 +42,11 @@ export async function createGame(_prev: FormState, formData: FormData): Promise<
   await requireAdmin();
 
   const t = getDict(await getLocale());
-  const name = String(formData.get("name") ?? "").trim();
+  const nameEn = String(formData.get("name_en") ?? "").trim();
+  const nameRu = String(formData.get("name_ru") ?? "").trim();
   const kind = String(formData.get("kind") ?? "clubs");
   const position = String(formData.get("position") ?? "");
-  if (!name) return { error: t.errors.nameRequired };
+  if (!nameEn || !nameRu) return { error: t.errors.nameRequired };
   if (kind !== "clubs" && kind !== "players") return { error: t.errors.invalidKind };
   if (position && !["GK", "DF", "MF", "FW"].includes(position)) {
     return { error: t.errors.invalidPosition };
@@ -53,7 +54,8 @@ export async function createGame(_prev: FormState, formData: FormData): Promise<
 
   const supabase = getSupabase();
   const { error: gameError } = await supabase.from("games").insert({
-    name,
+    name_en: nameEn,
+    name_ru: nameRu,
     kind,
     position: kind === "players" && position ? position : null,
   });

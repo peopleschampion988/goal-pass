@@ -33,13 +33,25 @@ export function NewGameForm({
   return (
     <form action={formAction} className="mt-6 flex flex-col gap-6">
       <label className="flex flex-col gap-2">
-        <span className="text-sm font-medium">{t.admin.gameName}</span>
+        <span className="text-sm font-medium">{t.admin.gameNameEn}</span>
         <input
           type="text"
-          name="name"
-          placeholder={t.admin.gameNamePlaceholder}
+          name="name_en"
+          placeholder={t.admin.gameNameEnPlaceholder}
           required
-          className="rounded-xl border border-black/[.12] bg-transparent px-4 py-3 outline-none transition-colors focus:border-black/40"
+          className="rounded-xl border border-black/[.12] bg-transparent px-4 py-3 text-base outline-none transition-colors focus:border-black/40"
+        />
+      </label>
+
+      <label className="flex flex-col gap-2">
+        <span className="text-sm font-medium">{t.admin.gameNameRu}</span>
+        <input
+          type="text"
+          name="name_ru"
+          placeholder={t.admin.gameNameRuPlaceholder}
+          required
+          lang="ru"
+          className="rounded-xl border border-black/[.12] bg-transparent px-4 py-3 text-base outline-none transition-colors focus:border-black/40"
         />
       </label>
 

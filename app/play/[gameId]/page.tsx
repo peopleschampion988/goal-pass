@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { notFound } from "next/navigation";
-import { getDict } from "@/lib/i18n";
+import { gameName, getDict } from "@/lib/i18n";
 import { getLocale } from "@/lib/locale";
 import { getSupabase } from "@/lib/supabase";
 import type { Club, Contender, Game, Player } from "@/lib/types";
@@ -25,7 +25,7 @@ export default async function PlayPage({ params }: PageProps<"/play/[gameId]">) 
 
   const { data: game } = await supabase
     .from("games")
-    .select("id, name, status, kind, position")
+    .select("id, name_en, name_ru, status, kind, position")
     .eq("id", gameId)
     .maybeSingle<Game>();
 
@@ -61,7 +61,7 @@ export default async function PlayPage({ params }: PageProps<"/play/[gameId]">) 
     <main className="mx-auto w-full max-w-4xl flex-1 px-4 py-8">
       <KnockoutGame
         gameId={game.id}
-        gameName={game.name}
+        gameName={gameName(game, locale)}
         playId={randomUUID()}
         contenders={shuffle(contenders)}
         leaderboardHref={game.kind === "players" ? "/leaderboard/players" : "/leaderboard"}

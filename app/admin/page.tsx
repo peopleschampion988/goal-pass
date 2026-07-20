@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { requireAdmin } from "@/lib/admin-auth";
 import { logout, setGameStatus } from "@/lib/actions/admin";
-import { getDict, plural, words } from "@/lib/i18n";
+import { gameName, getDict, plural, words } from "@/lib/i18n";
 import { getLocale } from "@/lib/locale";
 import { getSupabase } from "@/lib/supabase";
 import type { Game, GameStatus, Position } from "@/lib/types";
@@ -19,7 +19,7 @@ export default async function AdminPage() {
     await Promise.all([
       supabase
         .from("games")
-        .select("id, name, status, kind, position, created_at, plays(count)")
+        .select("id, name_en, name_ru, status, kind, position, created_at, plays(count)")
         .order("created_at", { ascending: false })
         .returns<(Game & { plays: { count: number }[] })[]>(),
       supabase.from("clubs").select("*", { count: "exact", head: true }),
@@ -85,7 +85,7 @@ export default async function AdminPage() {
                     href={`/admin/games/${game.id}`}
                     className="truncate text-lg font-semibold underline-offset-4 hover:underline"
                   >
-                    {game.name}
+                    {gameName(game, locale)}
                   </Link>
                   <span className="shrink-0 rounded-full border border-black/[.12] px-2 py-0.5 text-xs font-medium text-foreground/60">
                     {badge(game)}

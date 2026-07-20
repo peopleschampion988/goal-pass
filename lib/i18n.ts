@@ -21,6 +21,11 @@ export function plural(locale: Locale, n: number, forms: PluralForms): string {
   return `${n} ${forms.ru[2]}`;
 }
 
+// Falls back to the other language so a game never renders nameless.
+export function gameName(game: { name_en: string; name_ru: string }, locale: Locale): string {
+  return (locale === "ru" ? game.name_ru : game.name_en) || game.name_en || game.name_ru;
+}
+
 export const words = {
   clubs: { en: ["club", "clubs"], ru: ["клуб", "клуба", "клубов"] },
   players: { en: ["player", "players"], ru: ["игрок", "игрока", "игроков"] },
@@ -40,7 +45,7 @@ const en = {
     unknownContender: "Unknown contender.",
     adminNotConfigured: "ADMIN_PASSWORD is not configured on the server.",
     wrongPassword: "Wrong password.",
-    nameRequired: "Game name is required.",
+    nameRequired: "Enter the game name in both languages.",
     invalidKind: "Invalid game type.",
     invalidPosition: "Invalid position.",
   },
@@ -93,8 +98,10 @@ const en = {
     closed: "closed",
     back: "← All games",
     newGameTitle: "New game",
-    gameName: "Game name",
-    gameNamePlaceholder: "e.g. Champions of Europe",
+    gameNameEn: "Game name — English",
+    gameNameEnPlaceholder: "e.g. Champions of Europe",
+    gameNameRu: "Game name — Russian",
+    gameNameRuPlaceholder: "e.g. Чемпионы Европы",
     kindLabel: "Game type",
     positionLabel: "Position",
     positionAll: "All positions",
@@ -129,7 +136,7 @@ const ru: typeof en = {
     unknownContender: "Неизвестный участник.",
     adminNotConfigured: "ADMIN_PASSWORD не настроен на сервере.",
     wrongPassword: "Неверный пароль.",
-    nameRequired: "Укажи название игры.",
+    nameRequired: "Укажи название игры на обоих языках.",
     invalidKind: "Неверный тип игры.",
     invalidPosition: "Неверная позиция.",
   },
@@ -182,8 +189,10 @@ const ru: typeof en = {
     closed: "закрыта",
     back: "← Все игры",
     newGameTitle: "Новая игра",
-    gameName: "Название игры",
-    gameNamePlaceholder: "напр. Чемпионы Европы",
+    gameNameEn: "Название игры — английское",
+    gameNameEnPlaceholder: "напр. Champions of Europe",
+    gameNameRu: "Название игры — русское",
+    gameNameRuPlaceholder: "напр. Чемпионы Европы",
     kindLabel: "Тип игры",
     positionLabel: "Позиция",
     positionAll: "Все позиции",

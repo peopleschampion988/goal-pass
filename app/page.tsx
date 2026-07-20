@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { getSupabase } from "@/lib/supabase";
-import { getDict, plural, words } from "@/lib/i18n";
+import { gameName, getDict, plural, words } from "@/lib/i18n";
 import { getLocale } from "@/lib/locale";
 import type { Game, Position } from "@/lib/types";
 
@@ -15,7 +15,7 @@ export default async function Home() {
     await Promise.all([
       supabase
         .from("games")
-        .select("id, name, kind, position, created_at, plays(count)")
+        .select("id, name_en, name_ru, kind, position, created_at, plays(count)")
         .eq("status", "open")
         .order("created_at", { ascending: false })
         .returns<(Game & { plays: { count: number }[] })[]>(),
@@ -67,7 +67,7 @@ export default async function Home() {
             <div className="flex min-w-0 flex-col gap-1">
               <span className="flex items-center gap-2">
                 <span className="h-2 w-2 shrink-0 rounded-full bg-green-500" aria-hidden />
-                <span className="truncate text-lg font-semibold">{game.name}</span>
+                <span className="truncate text-lg font-semibold">{gameName(game, locale)}</span>
                 <span className="shrink-0 rounded-full border border-black/[.12] px-2 py-0.5 text-xs font-medium text-foreground/60">
                   {badge(game)}
                 </span>
