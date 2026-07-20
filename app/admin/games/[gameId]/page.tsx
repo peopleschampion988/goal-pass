@@ -76,7 +76,7 @@ export default async function AdminGamePage({ params }: PageProps<"/admin/games/
         {t.admin.back}
       </Link>
       <div className="mt-6 flex flex-col gap-1">
-        <h1 className="text-2xl font-bold">{gameName(game, locale)}</h1>
+        <h1 className="break-words text-xl font-bold sm:text-2xl">{gameName(game, locale)}</h1>
         <p className="text-sm text-foreground/60">
           <span className={game.status === "open" ? "text-green-600" : "text-red-500"}>
             ● {game.status === "open" ? t.admin.open : t.admin.closed}

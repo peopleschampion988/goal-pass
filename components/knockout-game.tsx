@@ -88,7 +88,9 @@ export function KnockoutGame({
             className="h-32 w-32"
             textClassName="text-4xl"
           />
-          <span className="text-3xl font-bold">{champion.name}</span>
+          <span className="max-w-full break-words text-2xl font-bold sm:text-3xl">
+            {champion.name}
+          </span>
           <span className="text-sm">
             {submitState === "pending" && (
               <span className="text-foreground/60">{t.play.counting}</span>
@@ -141,7 +143,7 @@ export function KnockoutGame({
         </Link>
         <div className="flex flex-col gap-1">
           <span className="text-sm font-medium text-foreground/55">{t.play.eyebrow}</span>
-          <h1 className="text-2xl font-bold">{gameName}</h1>
+          <h1 className="break-words text-xl font-bold sm:text-2xl">{gameName}</h1>
         </div>
         <div className="flex flex-col gap-2">
           <div className="flex items-center justify-between gap-3 text-sm text-foreground/60">

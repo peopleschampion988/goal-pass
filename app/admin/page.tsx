@@ -80,10 +80,10 @@ export default async function AdminPage() {
               className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-black/[.12] p-5"
             >
               <div className="flex min-w-0 flex-col gap-1">
-                <span className="flex items-center gap-2">
+                <span className="flex flex-wrap items-center gap-2">
                   <Link
                     href={`/admin/games/${game.id}`}
-                    className="truncate text-lg font-semibold underline-offset-4 hover:underline"
+                    className="min-w-0 break-words text-base font-semibold underline-offset-4 hover:underline sm:text-lg"
                   >
                     {gameName(game, locale)}
                   </Link>

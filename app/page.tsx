@@ -65,9 +65,11 @@ export default async function Home() {
             className="group flex items-center justify-between gap-4 rounded-2xl border border-black/[.12] p-5 transition-colors hover:bg-black/[.03]"
           >
             <div className="flex min-w-0 flex-col gap-1">
-              <span className="flex items-center gap-2">
+              <span className="flex flex-wrap items-center gap-2">
                 <span className="h-2 w-2 shrink-0 rounded-full bg-green-500" aria-hidden />
-                <span className="truncate text-lg font-semibold">{gameName(game, locale)}</span>
+                <span className="min-w-0 break-words text-base font-semibold sm:text-lg">
+                  {gameName(game, locale)}
+                </span>
                 <span className="shrink-0 rounded-full border border-black/[.12] px-2 py-0.5 text-xs font-medium text-foreground/60">
                   {badge(game)}
                 </span>

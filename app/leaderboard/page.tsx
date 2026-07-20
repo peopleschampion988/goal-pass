@@ -40,7 +40,7 @@ export default async function LeaderboardPage() {
       </Link>
 
       <div className="mt-6 flex flex-col gap-2">
-        <h1 className="text-3xl font-bold">🏆 {t.leaderboard.title}</h1>
+        <h1 className="text-2xl font-bold sm:text-3xl">🏆 {t.leaderboard.title}</h1>
         <p className="max-w-xl text-foreground/65">{t.leaderboard.sub}</p>
       </div>
 
