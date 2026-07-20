@@ -34,9 +34,9 @@ export function LeaderboardList({ rows, maxScore }: { rows: LeaderboardRow[]; ma
           />
           <div className="flex min-w-0 flex-1 flex-col gap-1.5">
             <div className="flex items-baseline justify-between gap-3">
-              <span className="truncate font-medium">
-                {row.name}{" "}
-                <span className="text-sm font-normal text-foreground/45">{row.subtitle}</span>
+              <span className="flex min-w-0 flex-col sm:flex-row sm:items-baseline sm:gap-2">
+                <span className="truncate font-medium">{row.name}</span>
+                <span className="truncate text-sm text-foreground/45">{row.subtitle}</span>
               </span>
               <span className="shrink-0 font-mono text-sm font-semibold">🏆 {row.score}</span>
             </div>
@@ -67,7 +67,7 @@ export function LeaderboardTabs({
         : "border-black/[.12] text-foreground/70 hover:bg-black/[.03] hover:text-foreground"
     }`;
   return (
-    <div className="mt-6 flex gap-2">
+    <div className="mt-6 flex flex-wrap gap-2">
       <Link href="/leaderboard" className={tabClass(active === "clubs")}>
         {labels.clubs}
       </Link>

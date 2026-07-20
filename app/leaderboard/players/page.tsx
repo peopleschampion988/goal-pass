@@ -14,7 +14,16 @@ const SECTIONS: { position: Position; emoji: string }[] = [
   { position: "FW", emoji: "⚽" },
 ];
 
-export default async function PlayersLeaderboardPage() {
+function isPosition(value: unknown): value is Position {
+  return value === "GK" || value === "DF" || value === "MF" || value === "FW";
+}
+
+export default async function PlayersLeaderboardPage({
+  searchParams,
+}: PageProps<"/leaderboard/players">) {
+  const { pos } = await searchParams;
+  const activePos = isPosition(pos) ? pos : null;
+
   const locale = await getLocale();
   const t = getDict(locale);
 
@@ -35,7 +44,9 @@ export default async function PlayersLeaderboardPage() {
 
   const totalPoints = rows.reduce((sum, row) => sum + row.score, 0);
 
-  const sections = SECTIONS.map(({ position, emoji }) => {
+  const sections = SECTIONS.filter(
+    (section) => !activePos || section.position === activePos,
+  ).map(({ position, emoji }) => {
     const ranked = rows
       .filter((row) => row.position === position)
       .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
@@ -47,6 +58,13 @@ export default async function PlayersLeaderboardPage() {
       maxScore: ranked[0]?.score || 1,
     };
   });
+
+  const posPillClass = (active: boolean) =>
+    `rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
+      active
+        ? "border-foreground bg-black/[.05] text-foreground"
+        : "border-black/[.12] text-foreground/60 hover:bg-black/[.03] hover:text-foreground"
+    }`;
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10">
@@ -67,6 +85,21 @@ export default async function PlayersLeaderboardPage() {
         labels={{ clubs: t.leaderboard.tabClubs, players: t.leaderboard.tabPlayers }}
       />
 
+      <div className="mt-3 flex flex-wrap gap-2">
+        <Link href="/leaderboard/players" className={posPillClass(!activePos)}>
+          {t.leaderboard.allPositions}
+        </Link>
+        {SECTIONS.map(({ position, emoji }) => (
+          <Link
+            key={position}
+            href={`/leaderboard/players?pos=${position}`}
+            className={posPillClass(activePos === position)}
+          >
+            {emoji} {t.positions[position]}
+          </Link>
+        ))}
+      </div>
+
       {error && (
         <p className="mt-6 text-sm text-red-500">
           {t.leaderboard.loadError} {error.message}
@@ -74,8 +107,16 @@ export default async function PlayersLeaderboardPage() {
       )}
 
       <div className="mt-8 flex items-center justify-between text-sm font-medium text-foreground/55">
-        <span>{plural(locale, rows.length, words.players)}</span>
-        <span>{plural(locale, totalPoints, words.points)}</span>
+        <span>
+          {plural(
+            locale,
+            sections.reduce((sum, section) => sum + section.ranked.length, 0),
+            words.players,
+          )}
+        </span>
+        <span>
+          {plural(locale, activePos ? (sections[0]?.points ?? 0) : totalPoints, words.points)}
+        </span>
       </div>
 
       <div className="mt-3 flex flex-col gap-8">
