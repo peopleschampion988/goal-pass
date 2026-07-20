@@ -12,15 +12,101 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+}
+
+:focus-visible {
+  outline: 2px solid var(--foreground);
+  outline-offset: 2px;
+}
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes champion-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes win-pounce {
+  0% {
+    transform: scale(1);
+  }
+  40% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes lose-fade {
+  to {
+    opacity: 0.3;
+    transform: scale(0.96);
+    filter: grayscale(1);
+  }
+}
+
+.rise-in {
+  animation: rise-in 0.3s ease-out both;
+}
+
+.slide-in {
+  animation: slide-in 0.3s ease-out both;
+}
+
+.champion-pop {
+  animation: champion-pop 0.35s ease-out both;
+}
+
+.pop-in {
+  animation: champion-pop 0.25s ease-out both;
+}
+
+.win-pounce {
+  animation: win-pounce 0.4s ease-out both;
+}
+
+.lose-fade {
+  animation: lose-fade 0.4s ease-out forwards;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rise-in,
+  .slide-in,
+  .champion-pop,
+  .pop-in,
+  .win-pounce,
+  .lose-fade {
+    animation: none;
+  }
 }
