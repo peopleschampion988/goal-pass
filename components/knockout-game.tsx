@@ -12,6 +12,7 @@ type Props = {
   gameName: string;
   playId: string; // server-generated; doubles as the idempotency key
   contenders: Contender[]; // pre-shuffled on the server
+  leaderboardHref: string; // clubs and players have separate leaderboards
   locale: Locale;
 };
 
@@ -19,7 +20,14 @@ type SubmitState = "idle" | "pending" | "done" | "error";
 
 // Gauntlet elimination: the picked contender stays on and faces the next
 // challenger until everyone has been faced; the survivor is champion.
-export function KnockoutGame({ gameId, gameName, playId, contenders, locale }: Props) {
+export function KnockoutGame({
+  gameId,
+  gameName,
+  playId,
+  contenders,
+  leaderboardHref,
+  locale,
+}: Props) {
   const t = getDict(locale);
 
   const [holder, setHolder] = useState<Contender>(contenders[0]);
@@ -104,7 +112,7 @@ export function KnockoutGame({ gameId, gameName, playId, contenders, locale }: P
         </div>
         <div className="flex flex-wrap justify-center gap-3">
           <Link
-            href="/leaderboard"
+            href={leaderboardHref}
             className="rounded-full bg-foreground px-5 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-85"
           >
             {t.play.viewLeaderboard}

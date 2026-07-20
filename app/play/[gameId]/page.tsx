@@ -64,6 +64,7 @@ export default async function PlayPage({ params }: PageProps<"/play/[gameId]">) 
         gameName={game.name}
         playId={randomUUID()}
         contenders={shuffle(contenders)}
+        leaderboardHref={game.kind === "players" ? "/leaderboard/players" : "/leaderboard"}
         locale={locale}
       />
     </main>
