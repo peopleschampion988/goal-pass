@@ -3,9 +3,10 @@
 import { useRef, useState, useTransition } from "react";
 import Link from "next/link";
 import { submitPlay } from "@/lib/actions/play";
-import { getDict, type Locale } from "@/lib/i18n";
+import { format, getDict, type Locale } from "@/lib/i18n";
 import type { Contender } from "@/lib/types";
 import { ContenderCard, ContenderImage } from "@/components/contender-card";
+import { ShareButtons } from "@/components/share-buttons";
 
 type Props = {
   gameId: string;
@@ -112,6 +113,12 @@ export function KnockoutGame({
             </button>
           )}
         </div>
+        <ShareButtons
+          title={gameName}
+          text={format(t.share.championText, { game: gameName, name: champion.name })}
+          shareLabel={t.share.share}
+          copiedLabel={t.share.copied}
+        />
         <div className="flex flex-wrap justify-center gap-3">
           <Link
             href={leaderboardHref}

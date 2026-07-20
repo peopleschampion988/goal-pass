@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Geist, Geist_Mono } from "next/font/google";
 import { getDict } from "@/lib/i18n";
 import { getLocale } from "@/lib/locale";
+import { siteUrl } from "@/lib/site";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { MobileMenu } from "@/components/mobile-menu";
 import "./globals.css";
@@ -18,8 +19,27 @@ const geistMono = Geist_Mono({
 });
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = getDict(await getLocale());
-  return { title: t.meta.title, description: t.meta.description };
+  const locale = await getLocale();
+  const t = getDict(locale);
+  return {
+    metadataBase: new URL(siteUrl),
+    title: { default: t.meta.title, template: `%s · ${t.meta.title}` },
+    description: t.meta.description,
+    applicationName: t.meta.title,
+    openGraph: {
+      type: "website",
+      siteName: t.meta.title,
+      title: t.meta.title,
+      description: t.meta.description,
+      url: "/",
+      locale: locale === "ru" ? "ru_RU" : "en_US",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: t.meta.title,
+      description: t.meta.description,
+    },
+  };
 }
 
 export default async function RootLayout({

@@ -1,5 +1,7 @@
 import { randomUUID } from "node:crypto";
+import { cache } from "react";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { gameName, getDict } from "@/lib/i18n";
 import { getLocale } from "@/lib/locale";
 import { getSupabase } from "@/lib/supabase";
@@ -17,18 +19,38 @@ function shuffle<T>(items: T[]): T[] {
   return result;
 }
 
+// Fetched by both generateMetadata and the page; cache() dedupes the query.
+const getGame = cache(async (gameId: string) => {
+  const { data } = await getSupabase()
+    .from("games")
+    .select("id, name_en, name_ru, status, kind, position")
+    .eq("id", gameId)
+    .maybeSingle<Game>();
+  return data;
+});
+
+export async function generateMetadata({
+  params,
+}: PageProps<"/play/[gameId]">): Promise<Metadata> {
+  const { gameId } = await params;
+  const locale = await getLocale();
+  const game = await getGame(gameId);
+  if (!game) return {};
+  const title = gameName(game, locale);
+  return {
+    title,
+    openGraph: { title, url: `/play/${gameId}` },
+    twitter: { title },
+  };
+}
+
 export default async function PlayPage({ params }: PageProps<"/play/[gameId]">) {
   const { gameId } = await params;
   const locale = await getLocale();
   const t = getDict(locale);
   const supabase = getSupabase();
 
-  const { data: game } = await supabase
-    .from("games")
-    .select("id, name_en, name_ru, status, kind, position")
-    .eq("id", gameId)
-    .maybeSingle<Game>();
-
+  const game = await getGame(gameId);
   if (!game || game.status !== "open") notFound();
 
   let contenders: Contender[];

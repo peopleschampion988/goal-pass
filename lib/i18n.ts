@@ -21,6 +21,11 @@ export function plural(locale: Locale, n: number, forms: PluralForms): string {
   return `${n} ${forms.ru[2]}`;
 }
 
+// Tiny template helper: format("Hi {name}", { name: "Sam" }) => "Hi Sam".
+export function format(template: string, vars: Record<string, string>): string {
+  return template.replace(/\{(\w+)\}/g, (_, key) => vars[key] ?? "");
+}
+
 // Falls back to the other language so a game never renders nameless.
 export function gameName(game: { name_en: string; name_ru: string }, locale: Locale): string {
   return (locale === "ru" ? game.name_ru : game.name_en) || game.name_en || game.name_ru;
@@ -48,6 +53,11 @@ const en = {
     nameRequired: "Enter the game name in both languages.",
     invalidKind: "Invalid game type.",
     invalidPosition: "Invalid position.",
+  },
+  share: {
+    share: "Share",
+    copied: "Link copied!",
+    championText: 'My champion in "{game}" — {name}! Pick yours:',
   },
   kinds: { clubs: "Clubs", players: "Players" },
   positions: { GK: "Goalkeepers", DF: "Defenders", MF: "Midfielders", FW: "Forwards" },
@@ -136,6 +146,11 @@ const ru: typeof en = {
     nameRequired: "Укажи название игры на обоих языках.",
     invalidKind: "Неверный тип игры.",
     invalidPosition: "Неверная позиция.",
+  },
+  share: {
+    share: "Поделиться",
+    copied: "Ссылка скопирована!",
+    championText: "Мой чемпион в «{game}» — {name}! Выбери своего:",
   },
   kinds: { clubs: "Клубы", players: "Игроки" },
   positions: { GK: "Вратари", DF: "Защитники", MF: "Полузащитники", FW: "Нападающие" },

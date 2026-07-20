@@ -7,6 +7,11 @@ import { LeaderboardList, LeaderboardTabs } from "@/components/leaderboard-list"
 
 export const dynamic = "force-dynamic";
 
+export async function generateMetadata() {
+  const t = getDict(await getLocale());
+  return { title: t.leaderboard.title, description: t.leaderboard.sub };
+}
+
 export default async function LeaderboardPage() {
   const locale = await getLocale();
   const t = getDict(locale);

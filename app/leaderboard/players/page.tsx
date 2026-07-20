@@ -18,6 +18,11 @@ function isPosition(value: unknown): value is Position {
   return value === "GK" || value === "DF" || value === "MF" || value === "FW";
 }
 
+export async function generateMetadata() {
+  const t = getDict(await getLocale());
+  return { title: t.leaderboard.title, description: t.leaderboard.playersSub };
+}
+
 export default async function PlayersLeaderboardPage({
   searchParams,
 }: PageProps<"/leaderboard/players">) {
