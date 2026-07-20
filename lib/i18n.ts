@@ -23,11 +23,15 @@ export function plural(locale: Locale, n: number, forms: PluralForms): string {
 
 export const words = {
   clubs: { en: ["club", "clubs"], ru: ["клуб", "клуба", "клубов"] },
+  players: { en: ["player", "players"], ru: ["игрок", "игрока", "игроков"] },
   plays: { en: ["play", "plays"], ru: ["игра", "игры", "игр"] },
   points: { en: ["point", "points"], ru: ["очко", "очка", "очков"] },
 } satisfies Record<string, PluralForms>;
 
 const en = {
+  kinds: { clubs: "Clubs", players: "Players" },
+  positions: { GK: "Goalkeepers", DF: "Defenders", MF: "Midfielders", FW: "Forwards" },
+  position: { GK: "Goalkeeper", DF: "Defender", MF: "Midfielder", FW: "Forward" },
   nav: { games: "Games", leaderboard: "Leaderboard", menu: "Menu", language: "Language" },
   footer: "One finished game · one point for the champion",
   home: {
@@ -55,8 +59,10 @@ const en = {
   leaderboard: {
     back: "← All games",
     title: "Leaderboard",
-    sub: "Every finished game crowns a champion — the champion club scores a point.",
-    loadError: "Could not load clubs:",
+    sub: "Every finished game crowns a champion — the champion scores a point.",
+    tabClubs: "Clubs",
+    tabPlayers: "Players",
+    loadError: "Could not load the leaderboard:",
   },
   admin: {
     staffOnly: "Staff only",
@@ -72,8 +78,13 @@ const en = {
     newGameTitle: "New game",
     gameName: "Game name",
     gameNamePlaceholder: "e.g. Champions of Europe",
+    kindLabel: "Game type",
+    positionLabel: "Position",
+    positionAll: "All positions",
     clubsLabel: "Clubs",
-    allClubsNote: "Every game includes all clubs.",
+    playersLabel: "Players",
+    allClubsNote: "Every club game includes all clubs.",
+    allPlayersNote: "The game includes every player of the chosen position.",
     create: "Create game",
     creating: "Creating…",
     loadGamesError: "Could not load games:",
@@ -90,6 +101,9 @@ const en = {
 };
 
 const ru: typeof en = {
+  kinds: { clubs: "Клубы", players: "Игроки" },
+  positions: { GK: "Вратари", DF: "Защитники", MF: "Полузащитники", FW: "Нападающие" },
+  position: { GK: "Вратарь", DF: "Защитник", MF: "Полузащитник", FW: "Нападающий" },
   nav: { games: "Игры", leaderboard: "Лидеры", menu: "Меню", language: "Язык" },
   footer: "Одна завершённая игра · одно очко чемпиону",
   home: {
@@ -117,8 +131,10 @@ const ru: typeof en = {
   leaderboard: {
     back: "← Все игры",
     title: "Таблица лидеров",
-    sub: "Каждая завершённая игра приносит клубу-чемпиону одно очко.",
-    loadError: "Не удалось загрузить клубы:",
+    sub: "Каждая завершённая игра приносит чемпиону одно очко.",
+    tabClubs: "Клубы",
+    tabPlayers: "Игроки",
+    loadError: "Не удалось загрузить таблицу лидеров:",
   },
   admin: {
     staffOnly: "Для организаторов",
@@ -134,8 +150,13 @@ const ru: typeof en = {
     newGameTitle: "Новая игра",
     gameName: "Название игры",
     gameNamePlaceholder: "напр. Чемпионы Европы",
+    kindLabel: "Тип игры",
+    positionLabel: "Позиция",
+    positionAll: "Все позиции",
     clubsLabel: "Клубы",
-    allClubsNote: "В каждой игре участвуют все клубы.",
+    playersLabel: "Игроки",
+    allClubsNote: "В каждой клубной игре участвуют все клубы.",
+    allPlayersNote: "В игре участвуют все игроки выбранной позиции.",
     create: "Создать игру",
     creating: "Создаём…",
     loadGamesError: "Не удалось загрузить игры:",

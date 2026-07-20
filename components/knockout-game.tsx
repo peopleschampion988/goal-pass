@@ -1,41 +1,40 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { submitPlay } from "@/lib/actions/play";
 import { getDict, type Locale } from "@/lib/i18n";
-import type { Club } from "@/lib/types";
-import { ClubCard } from "@/components/club-card";
+import type { Contender } from "@/lib/types";
+import { ContenderCard, ContenderImage } from "@/components/contender-card";
 
 type Props = {
   gameId: string;
   gameName: string;
   playId: string; // server-generated; doubles as the idempotency key
-  clubs: Club[]; // pre-shuffled on the server
+  contenders: Contender[]; // pre-shuffled on the server
   locale: Locale;
 };
 
 type SubmitState = "idle" | "pending" | "done" | "error";
 
-// Gauntlet elimination: the picked club stays on and faces the next
-// challenger until every club has been faced; the survivor is champion.
-export function KnockoutGame({ gameId, gameName, playId, clubs, locale }: Props) {
+// Gauntlet elimination: the picked contender stays on and faces the next
+// challenger until everyone has been faced; the survivor is champion.
+export function KnockoutGame({ gameId, gameName, playId, contenders, locale }: Props) {
   const t = getDict(locale);
 
-  const [holder, setHolder] = useState<Club>(clubs[0]);
+  const [holder, setHolder] = useState<Contender>(contenders[0]);
   const [challengerIndex, setChallengerIndex] = useState(1);
   const [winnerSide, setWinnerSide] = useState<"holder" | "challenger" | null>(null);
-  const [champion, setChampion] = useState<Club | null>(null);
+  const [champion, setChampion] = useState<Contender | null>(null);
   const [submitState, setSubmitState] = useState<SubmitState>("idle");
   const [submitError, setSubmitError] = useState("");
   const [, startTransition] = useTransition();
   const submitted = useRef(false);
 
-  const totalDuels = clubs.length - 1;
-  const duelNumber = challengerIndex; // duel k pits the holder against clubs[k]
+  const totalDuels = contenders.length - 1;
+  const duelNumber = challengerIndex; // duel k pits the holder against contenders[k]
 
-  function submit(winner: Club) {
+  function submit(winner: Contender) {
     if (submitted.current) return;
     submitted.current = true;
     setSubmitState("pending");
@@ -51,9 +50,9 @@ export function KnockoutGame({ gameId, gameName, playId, clubs, locale }: Props)
     });
   }
 
-  function advance(winner: Club) {
+  function advance(winner: Contender) {
     setWinnerSide(null);
-    if (challengerIndex + 1 >= clubs.length) {
+    if (challengerIndex + 1 >= contenders.length) {
       setChampion(winner);
       submit(winner);
       return;
@@ -63,7 +62,7 @@ export function KnockoutGame({ gameId, gameName, playId, clubs, locale }: Props)
   }
 
   // Show the win/lose effect briefly, then bring in the next challenger.
-  function pick(winner: Club) {
+  function pick(winner: Contender) {
     if (champion || winnerSide) return;
     setWinnerSide(winner.id === holder.id ? "holder" : "challenger");
     const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -75,12 +74,11 @@ export function KnockoutGame({ gameId, gameName, playId, clubs, locale }: Props)
       <div className="champion-pop mx-auto flex w-full max-w-md flex-col items-center gap-6 text-center">
         <div className="flex w-full flex-col items-center gap-4 rounded-3xl border border-black/[.12] px-8 py-10">
           <span className="text-sm font-medium text-foreground/60">🏆 {t.play.champion}</span>
-          <Image
-            src={`/club_logos/${champion.logo_path}`}
-            alt={`${champion.name} logo`}
-            width={512}
-            height={512}
-            className="h-32 w-32 object-contain"
+          <ContenderImage
+            name={champion.name}
+            imageSrc={champion.imageSrc}
+            className="h-32 w-32"
+            textClassName="text-4xl"
           />
           <span className="text-3xl font-bold">{champion.name}</span>
           <span className="text-sm">
@@ -122,7 +120,7 @@ export function KnockoutGame({ gameId, gameName, playId, clubs, locale }: Props)
     );
   }
 
-  const challenger = clubs[challengerIndex];
+  const challenger = contenders[challengerIndex];
 
   return (
     <div className="flex flex-col gap-6">
@@ -160,8 +158,8 @@ export function KnockoutGame({ gameId, gameName, playId, clubs, locale }: Props)
         }`}
       >
         <div key={holder.id} className="rise-in relative">
-          <ClubCard
-            club={holder}
+          <ContenderCard
+            contender={holder}
             onPick={() => pick(holder)}
             result={winnerSide ? (winnerSide === "holder" ? "win" : "lose") : null}
           />
@@ -170,8 +168,8 @@ export function KnockoutGame({ gameId, gameName, playId, clubs, locale }: Props)
           VS
         </span>
         <div key={challenger.id} className="slide-in">
-          <ClubCard
-            club={challenger}
+          <ContenderCard
+            contender={challenger}
             onPick={() => pick(challenger)}
             result={winnerSide ? (winnerSide === "challenger" ? "win" : "lose") : null}
           />

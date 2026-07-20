@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getSupabase } from "@/lib/supabase";
 import { getDict, plural, words } from "@/lib/i18n";
 import { getLocale } from "@/lib/locale";
+import type { Game, Position } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -10,14 +11,29 @@ export default async function Home() {
   const t = getDict(locale);
 
   const supabase = getSupabase();
-  const [{ data: games, error }, { count: clubCount }] = await Promise.all([
-    supabase
-      .from("games")
-      .select("id, name, created_at, plays(count)")
-      .eq("status", "open")
-      .order("created_at", { ascending: false }),
-    supabase.from("clubs").select("*", { count: "exact", head: true }),
-  ]);
+  const [{ data: games, error }, { count: clubCount }, { data: playerPositions }] =
+    await Promise.all([
+      supabase
+        .from("games")
+        .select("id, name, kind, position, created_at, plays(count)")
+        .eq("status", "open")
+        .order("created_at", { ascending: false })
+        .returns<(Game & { plays: { count: number }[] })[]>(),
+      supabase.from("clubs").select("*", { count: "exact", head: true }),
+      supabase.from("players").select("position").returns<{ position: Position }[]>(),
+    ]);
+
+  const poolSize = (game: Game) =>
+    game.kind === "players"
+      ? (playerPositions ?? []).filter((p) => !game.position || p.position === game.position).length
+      : (clubCount ?? 0);
+  const poolWords = (game: Game) => (game.kind === "players" ? words.players : words.clubs);
+  const badge = (game: Game) =>
+    game.kind === "players"
+      ? game.position
+        ? t.positions[game.position]
+        : t.kinds.players
+      : t.kinds.clubs;
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10">
@@ -52,9 +68,12 @@ export default async function Home() {
               <span className="flex items-center gap-2">
                 <span className="h-2 w-2 shrink-0 rounded-full bg-green-500" aria-hidden />
                 <span className="truncate text-lg font-semibold">{game.name}</span>
+                <span className="shrink-0 rounded-full border border-black/[.12] px-2 py-0.5 text-xs font-medium text-foreground/60">
+                  {badge(game)}
+                </span>
               </span>
               <span className="text-sm text-foreground/60">
-                {plural(locale, clubCount ?? 0, words.clubs)} ·{" "}
+                {plural(locale, poolSize(game), poolWords(game))} ·{" "}
                 {plural(locale, game.plays[0]?.count ?? 0, words.plays)}
               </span>
             </div>

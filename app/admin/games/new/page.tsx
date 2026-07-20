@@ -3,6 +3,7 @@ import { requireAdmin } from "@/lib/admin-auth";
 import { getDict } from "@/lib/i18n";
 import { getLocale } from "@/lib/locale";
 import { getSupabase } from "@/lib/supabase";
+import type { Player } from "@/lib/types";
 import { NewGameForm } from "@/components/new-game-form";
 
 export const dynamic = "force-dynamic";
@@ -14,10 +15,14 @@ export default async function NewGamePage() {
   const t = getDict(locale);
 
   const supabase = getSupabase();
-  const { data: clubs, error } = await supabase
-    .from("clubs")
-    .select("id, name, country, logo_path")
-    .order("name");
+  const [{ data: clubs, error }, { data: players }] = await Promise.all([
+    supabase.from("clubs").select("id, name, country, logo_path").order("name"),
+    supabase
+      .from("players")
+      .select("id, name, position, country, club, rank, photo_path")
+      .order("rank")
+      .returns<Player[]>(),
+  ]);
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10">
@@ -33,7 +38,7 @@ export default async function NewGamePage() {
           {t.admin.loadClubsError} {error.message}
         </p>
       )}
-      {clubs && <NewGameForm clubs={clubs} locale={locale} />}
+      {clubs && <NewGameForm clubs={clubs} players={players ?? []} locale={locale} />}
     </main>
   );
 }

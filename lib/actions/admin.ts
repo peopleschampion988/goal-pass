@@ -39,10 +39,20 @@ export async function createGame(_prev: FormState, formData: FormData): Promise<
   await requireAdmin();
 
   const name = String(formData.get("name") ?? "").trim();
+  const kind = String(formData.get("kind") ?? "clubs");
+  const position = String(formData.get("position") ?? "");
   if (!name) return { error: "Game name is required." };
+  if (kind !== "clubs" && kind !== "players") return { error: "Invalid game type." };
+  if (position && !["GK", "DF", "MF", "FW"].includes(position)) {
+    return { error: "Invalid position." };
+  }
 
   const supabase = getSupabase();
-  const { error: gameError } = await supabase.from("games").insert({ name });
+  const { error: gameError } = await supabase.from("games").insert({
+    name,
+    kind,
+    position: kind === "players" && position ? position : null,
+  });
   if (gameError) return { error: gameError.message };
 
   revalidatePath("/");

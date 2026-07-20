@@ -4,7 +4,7 @@ import { logout, setGameStatus } from "@/lib/actions/admin";
 import { getDict, plural, words } from "@/lib/i18n";
 import { getLocale } from "@/lib/locale";
 import { getSupabase } from "@/lib/supabase";
-import type { GameStatus } from "@/lib/types";
+import type { Game, GameStatus, Position } from "@/lib/types";
 
 export const dynamic = "force-dynamic";
 
@@ -15,13 +15,28 @@ export default async function AdminPage() {
   const t = getDict(locale);
 
   const supabase = getSupabase();
-  const [{ data: games, error }, { count: clubCount }] = await Promise.all([
-    supabase
-      .from("games")
-      .select("id, name, status, created_at, plays(count)")
-      .order("created_at", { ascending: false }),
-    supabase.from("clubs").select("*", { count: "exact", head: true }),
-  ]);
+  const [{ data: games, error }, { count: clubCount }, { data: playerPositions }] =
+    await Promise.all([
+      supabase
+        .from("games")
+        .select("id, name, status, kind, position, created_at, plays(count)")
+        .order("created_at", { ascending: false })
+        .returns<(Game & { plays: { count: number }[] })[]>(),
+      supabase.from("clubs").select("*", { count: "exact", head: true }),
+      supabase.from("players").select("position").returns<{ position: Position }[]>(),
+    ]);
+
+  const poolSize = (game: Game) =>
+    game.kind === "players"
+      ? (playerPositions ?? []).filter((p) => !game.position || p.position === game.position).length
+      : (clubCount ?? 0);
+  const poolWords = (game: Game) => (game.kind === "players" ? words.players : words.clubs);
+  const badge = (game: Game) =>
+    game.kind === "players"
+      ? game.position
+        ? t.positions[game.position]
+        : t.kinds.players
+      : t.kinds.clubs;
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10">
@@ -65,17 +80,22 @@ export default async function AdminPage() {
               className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-black/[.12] p-5"
             >
               <div className="flex min-w-0 flex-col gap-1">
-                <Link
-                  href={`/admin/games/${game.id}`}
-                  className="truncate text-lg font-semibold underline-offset-4 hover:underline"
-                >
-                  {game.name}
-                </Link>
+                <span className="flex items-center gap-2">
+                  <Link
+                    href={`/admin/games/${game.id}`}
+                    className="truncate text-lg font-semibold underline-offset-4 hover:underline"
+                  >
+                    {game.name}
+                  </Link>
+                  <span className="shrink-0 rounded-full border border-black/[.12] px-2 py-0.5 text-xs font-medium text-foreground/60">
+                    {badge(game)}
+                  </span>
+                </span>
                 <span className="text-sm text-foreground/60">
                   <span className={game.status === "open" ? "text-green-600" : "text-red-500"}>
                     ● {game.status === "open" ? t.admin.open : t.admin.closed}
                   </span>{" "}
-                  · {plural(locale, clubCount ?? 0, words.clubs)} ·{" "}
+                  · {plural(locale, poolSize(game), poolWords(game))} ·{" "}
                   {plural(locale, game.plays[0]?.count ?? 0, words.plays)}
                 </span>
               </div>
