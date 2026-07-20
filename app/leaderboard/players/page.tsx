@@ -22,7 +22,7 @@ export default async function PlayersLeaderboardPage({
   searchParams,
 }: PageProps<"/leaderboard/players">) {
   const { pos } = await searchParams;
-  const activePos = isPosition(pos) ? pos : null;
+  const activePos: Position = isPosition(pos) ? pos : "GK";
 
   const locale = await getLocale();
   const t = getDict(locale);
@@ -31,33 +31,21 @@ export default async function PlayersLeaderboardPage({
   const { data: players, error } = await supabase
     .from("players")
     .select("id, name, position, country, club, rank, photo_path, plays(count)")
+    .eq("position", activePos)
     .returns<(Player & { plays: { count: number }[] })[]>();
 
-  const rows = (players ?? []).map((player) => ({
-    id: player.id,
-    name: player.name,
-    position: player.position,
-    imageSrc: player.photo_path ? `/player_photos/${player.photo_path}` : null,
-    subtitle: `${player.club} · ${player.country}`,
-    score: player.plays[0]?.count ?? 0,
-  }));
+  const ranked = (players ?? [])
+    .map((player) => ({
+      id: player.id,
+      name: player.name,
+      imageSrc: player.photo_path ? `/player_photos/${player.photo_path}` : null,
+      subtitle: `${player.club} · ${player.country}`,
+      score: player.plays[0]?.count ?? 0,
+    }))
+    .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
 
-  const totalPoints = rows.reduce((sum, row) => sum + row.score, 0);
-
-  const sections = SECTIONS.filter(
-    (section) => !activePos || section.position === activePos,
-  ).map(({ position, emoji }) => {
-    const ranked = rows
-      .filter((row) => row.position === position)
-      .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name));
-    return {
-      position,
-      emoji,
-      ranked,
-      points: ranked.reduce((sum, row) => sum + row.score, 0),
-      maxScore: ranked[0]?.score || 1,
-    };
-  });
+  const totalPoints = ranked.reduce((sum, row) => sum + row.score, 0);
+  const maxScore = ranked[0]?.score || 1;
 
   const posPillClass = (active: boolean) =>
     `rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
@@ -86,9 +74,6 @@ export default async function PlayersLeaderboardPage({
       />
 
       <div className="mt-3 flex flex-wrap gap-2">
-        <Link href="/leaderboard/players" className={posPillClass(!activePos)}>
-          {t.leaderboard.allPositions}
-        </Link>
         {SECTIONS.map(({ position, emoji }) => (
           <Link
             key={position}
@@ -107,32 +92,12 @@ export default async function PlayersLeaderboardPage({
       )}
 
       <div className="mt-8 flex items-center justify-between text-sm font-medium text-foreground/55">
-        <span>
-          {plural(
-            locale,
-            sections.reduce((sum, section) => sum + section.ranked.length, 0),
-            words.players,
-          )}
-        </span>
-        <span>
-          {plural(locale, activePos ? (sections[0]?.points ?? 0) : totalPoints, words.points)}
-        </span>
+        <span>{plural(locale, ranked.length, words.players)}</span>
+        <span>{plural(locale, totalPoints, words.points)}</span>
       </div>
 
-      <div className="mt-3 flex flex-col gap-8">
-        {sections.map((section) => (
-          <section key={section.position} className="flex flex-col gap-3">
-            <div className="flex items-center justify-between border-b border-black/[.08] pb-2">
-              <h2 className="text-lg font-bold">
-                {section.emoji} {t.positions[section.position]}
-              </h2>
-              <span className="text-sm font-medium text-foreground/55">
-                {plural(locale, section.points, words.points)}
-              </span>
-            </div>
-            <LeaderboardList rows={section.ranked} maxScore={section.maxScore} />
-          </section>
-        ))}
+      <div className="mt-3">
+        <LeaderboardList rows={ranked} maxScore={maxScore} />
       </div>
     </main>
   );

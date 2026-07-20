@@ -37,12 +37,7 @@ export default async function Home() {
 
   return (
     <main className="mx-auto w-full max-w-3xl flex-1 px-4 py-10">
-      <div className="flex flex-col gap-2">
-        <h1 className="text-3xl font-bold sm:text-4xl">{t.home.title}</h1>
-        <p className="max-w-xl text-foreground/65">{t.home.sub}</p>
-      </div>
-
-      <div className="mt-8 flex flex-col gap-3">
+      <div className="flex flex-col gap-3">
         <div className="flex items-center justify-between text-sm font-medium text-foreground/55">
           <span>{t.home.openGames}</span>
           <span>{games?.length ?? 0}</span>
