@@ -1,12 +1,15 @@
 "use client";
 
+import { useTransition } from "react";
 import { locales, type Locale } from "@/lib/i18n";
+import { setLocale } from "@/lib/actions/locale";
 
 export function LocaleSwitcher({ locale }: { locale: Locale }) {
+  const [pending, startTransition] = useTransition();
+
   function switchTo(next: Locale) {
-    if (next === locale) return;
-    document.cookie = `locale=${next};path=/;max-age=31536000;samesite=lax`;
-    location.reload();
+    if (next === locale || pending) return;
+    startTransition(() => setLocale(next));
   }
 
   return (

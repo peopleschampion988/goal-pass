@@ -6,19 +6,22 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { ADMIN_COOKIE, adminToken, requireAdmin } from "@/lib/admin-auth";
 import { getSupabase } from "@/lib/supabase";
+import { getDict } from "@/lib/i18n";
+import { getLocale } from "@/lib/locale";
 import type { GameStatus } from "@/lib/types";
 
 export type FormState = { error: string } | null;
 
 export async function login(_prev: FormState, formData: FormData): Promise<FormState> {
+  const t = getDict(await getLocale());
   const password = String(formData.get("password") ?? "");
   const expected = process.env.ADMIN_PASSWORD;
-  if (!expected) return { error: "ADMIN_PASSWORD is not configured on the server." };
+  if (!expected) return { error: t.errors.adminNotConfigured };
 
   // Hash both sides so timingSafeEqual gets equal-length buffers.
   const a = createHash("sha256").update(password).digest();
   const b = createHash("sha256").update(expected).digest();
-  if (!timingSafeEqual(a, b)) return { error: "Wrong password." };
+  if (!timingSafeEqual(a, b)) return { error: t.errors.wrongPassword };
 
   (await cookies()).set(ADMIN_COOKIE, adminToken(), {
     httpOnly: true,
@@ -38,13 +41,14 @@ export async function logout(): Promise<void> {
 export async function createGame(_prev: FormState, formData: FormData): Promise<FormState> {
   await requireAdmin();
 
+  const t = getDict(await getLocale());
   const name = String(formData.get("name") ?? "").trim();
   const kind = String(formData.get("kind") ?? "clubs");
   const position = String(formData.get("position") ?? "");
-  if (!name) return { error: "Game name is required." };
-  if (kind !== "clubs" && kind !== "players") return { error: "Invalid game type." };
+  if (!name) return { error: t.errors.nameRequired };
+  if (kind !== "clubs" && kind !== "players") return { error: t.errors.invalidKind };
   if (position && !["GK", "DF", "MF", "FW"].includes(position)) {
-    return { error: "Invalid position." };
+    return { error: t.errors.invalidPosition };
   }
 
   const supabase = getSupabase();

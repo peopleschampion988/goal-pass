@@ -29,6 +29,21 @@ export const words = {
 } satisfies Record<string, PluralForms>;
 
 const en = {
+  meta: {
+    title: "Club Duels",
+    description: "Pick your favorite football club, duel by duel",
+  },
+  errors: {
+    invalidIds: "Invalid ids.",
+    gameNotFound: "Game not found.",
+    gameClosed: "This game is closed.",
+    unknownContender: "Unknown contender.",
+    adminNotConfigured: "ADMIN_PASSWORD is not configured on the server.",
+    wrongPassword: "Wrong password.",
+    nameRequired: "Game name is required.",
+    invalidKind: "Invalid game type.",
+    invalidPosition: "Invalid position.",
+  },
   kinds: { clubs: "Clubs", players: "Players" },
   positions: { GK: "Goalkeepers", DF: "Defenders", MF: "Midfielders", FW: "Forwards" },
   position: { GK: "Goalkeeper", DF: "Defender", MF: "Midfielder", FW: "Forward" },
@@ -103,6 +118,21 @@ const en = {
 };
 
 const ru: typeof en = {
+  meta: {
+    title: "Клубные дуэли",
+    description: "Выбирай любимый футбольный клуб, дуэль за дуэлью",
+  },
+  errors: {
+    invalidIds: "Неверные идентификаторы.",
+    gameNotFound: "Игра не найдена.",
+    gameClosed: "Эта игра закрыта.",
+    unknownContender: "Неизвестный участник.",
+    adminNotConfigured: "ADMIN_PASSWORD не настроен на сервере.",
+    wrongPassword: "Неверный пароль.",
+    nameRequired: "Укажи название игры.",
+    invalidKind: "Неверный тип игры.",
+    invalidPosition: "Неверная позиция.",
+  },
   kinds: { clubs: "Клубы", players: "Игроки" },
   positions: { GK: "Вратари", DF: "Защитники", MF: "Полузащитники", FW: "Нападающие" },
   position: { GK: "Вратарь", DF: "Защитник", MF: "Полузащитник", FW: "Нападающий" },

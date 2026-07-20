@@ -1,6 +1,8 @@
 "use server";
 
 import { getSupabase } from "@/lib/supabase";
+import { getDict } from "@/lib/i18n";
+import { getLocale } from "@/lib/locale";
 
 export type SubmitResult = { ok: true } | { ok: false; error: string };
 
@@ -11,8 +13,9 @@ export async function submitPlay(
   gameId: string,
   winnerId: string,
 ): Promise<SubmitResult> {
+  const t = getDict(await getLocale());
   if (![playId, gameId, winnerId].every((v) => UUID_RE.test(v))) {
-    return { ok: false, error: "Invalid ids." };
+    return { ok: false, error: t.errors.invalidIds };
   }
 
   const supabase = getSupabase();
@@ -22,8 +25,8 @@ export async function submitPlay(
     .select("status, kind")
     .eq("id", gameId)
     .maybeSingle();
-  if (!game) return { ok: false, error: "Game not found." };
-  if (game.status !== "open") return { ok: false, error: "This game is closed." };
+  if (!game) return { ok: false, error: t.errors.gameNotFound };
+  if (game.status !== "open") return { ok: false, error: t.errors.gameClosed };
 
   const winnerTable = game.kind === "players" ? "players" : "clubs";
   const { data: winner } = await supabase
@@ -31,7 +34,7 @@ export async function submitPlay(
     .select("id")
     .eq("id", winnerId)
     .maybeSingle();
-  if (!winner) return { ok: false, error: "Unknown contender." };
+  if (!winner) return { ok: false, error: t.errors.unknownContender };
 
   const { error } = await supabase.from("plays").insert({
     id: playId,

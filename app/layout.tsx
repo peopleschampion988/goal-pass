@@ -17,10 +17,10 @@ const geistMono = Geist_Mono({
   subsets: ["latin", "cyrillic"],
 });
 
-export const metadata: Metadata = {
-  title: "Club Duels",
-  description: "Pick your favorite football club, duel by duel",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = getDict(await getLocale());
+  return { title: t.meta.title, description: t.meta.description };
+}
 
 export default async function RootLayout({
   children,
