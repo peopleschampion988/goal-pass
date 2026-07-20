@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Goal Pass
 
-## Getting Started
+Knockout duels for football fans: two contenders at a time — tap the one you love more. The winner stays on until every contender has been faced, and the last one standing scores a point on the leaderboard.
 
-First, run the development server:
+Two kinds of games:
+
+- **Clubs** — 30 popular European clubs.
+- **Players** — the 100 best players of 2026, optionally scoped to a position (goalkeepers, defenders, midfielders, forwards).
+
+Built with Next.js (App Router) + Supabase. UI in English and Russian.
+
+## Setup
 
 ```bash
+npm install
+cp .env.example .env.local   # fill in the values (see below)
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+`.env.local` (server-only, never committed):
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+| Variable | What it is |
+| --- | --- |
+| `SUPABASE_URL` | Supabase project URL (Dashboard → Project Settings → API) |
+| `SUPABASE_SECRET_KEY` | Service-role secret key |
+| `ADMIN_PASSWORD` | Password for the admin panel |
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Database: apply `supabase/migrations/` (via `supabase db push` or the SQL editor), then seed clubs with `supabase/seed.sql` and players with `node scripts/seed-players.mjs`.
 
-## Learn More
+## Admin panel
 
-To learn more about Next.js, take a look at the following resources:
+The admin panel lives at **`/admin`** and is where games are created, closed, reopened, and inspected.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+1. Open `http://localhost:3000/admin` (or `/admin` on the deployed site).
+2. You'll be redirected to `/admin/login` — enter the password from `ADMIN_PASSWORD` in `.env.local` (on production, the value set in the hosting provider's environment variables).
+3. That's it — you're in. The session is a cookie that lasts 7 days; use the **Log out** button in the top-right corner to end it early.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Notes:
 
-## Deploy on Vercel
+- There is no username — just the one shared password.
+- Changing `ADMIN_PASSWORD` immediately invalidates everyone's admin sessions.
+- If you see "ADMIN_PASSWORD is not configured on the server", the env var is missing where the app runs.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Scripts
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Script | Purpose |
+| --- | --- |
+| `scripts/download-logos.sh` | Downloads club logos into `public/club_logos/` |
+| `scripts/download-player-photos.mjs` | Downloads player cutouts from TheSportsDB into `public/player_photos/` and regenerates `supabase/seed_players.sql` |
+| `scripts/seed-players.mjs` | Upserts the 100 players into the Supabase `players` table |
+| `scripts/players-data.mjs` | The curated top-100 list both scripts read from |
